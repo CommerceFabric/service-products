@@ -15,3 +15,13 @@
     - But for this micro-service, I intentionally chose the Layered Architecture pattern, as its lower complexity makes it well-suited to small and medium-sized applications.
 
 ## Technical Stack
+
+- Uses Entity Framework Core (EF) as the ORM for database interactions, providing a higher-level abstraction over raw SQL queries.
+    - As EF is better for change tracking (migrations), and has LINQ support
+    - And is more standard than the Dapper micro-ORM that I demonstrated in [User Service](https://github.com/CommerceFabric/service-user), which is more suited for performance-critical scenarios.
+- Dependency Injection
+- Uses AutoMapper
+- Layered Architecture Principles (split sub-projects: API, BusinessLogic, DataAccess)
+- Has injected Exception Handling Middleware
+- Has Fluent Validation for confirming correctness of DTO's
+- Uses Swagger for interactive API documentation
