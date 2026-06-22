@@ -6,8 +6,8 @@ namespace BusinessLogicLayer.DTO
 {
     public record ProductAddRequest
     (
-        string ProductName,
-        CategoryOptions Category,
+        string? ProductName,
+        CategoryOptions? Category,
         double? UnitPrice,
         int? QuantityInStock
     );

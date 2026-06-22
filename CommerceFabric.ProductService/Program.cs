@@ -3,12 +3,21 @@ using CommerceFabric.ProductService.API.ApiEndpoints;
 using CommerceFabric.ProductService.API.Middleware;
 using DataAccessLayer;
 using FluentValidation.AspNetCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add my project services to the container.
 builder.Services.AddDataAccessLayer(builder.Configuration);
 builder.Services.AddBusinessLogicLayer();
+
+// Required to allow for enums as strings in the DTOs passed to the Minimal API Endpoints
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(
+        new JsonStringEnumConverter()
+    );
+});
 
 // Add Controllers to the container.
 builder.Services.AddControllers();
