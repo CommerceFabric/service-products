@@ -7,7 +7,7 @@
 
 - [MySQL](https://dev.mysql.com/downloads/mysql/) Community Server, 9.7.1 or higher
 
-- Seed the database using the following sql:
+- Seed the database using the following sql (will later be done using a startup seeder + migrations):
 ```sql
     -- Create the database
 CREATE DATABASE IF NOT EXISTS ecommerceproductsdatabase;
