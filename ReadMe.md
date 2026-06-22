@@ -61,5 +61,7 @@ INSERT INTO products (ProductID, ProductName, Category, UnitPrice, QuantityInSto
 - Layered Architecture Principles (split sub-projects: API, BusinessLogic, DataAccess)
 - Has injected Exception Handling Middleware
 - Has Fluent Validation for confirming correctness of DTO's
+    - Unlike the [User Service](https://github.com/CommerceFabric/service-user), which has Controller based API which comes from the MVC Pipeline and so are automatically validated by the Fluent Validation Middleware, this micro-service uses Minimal API endpoints, which do not come from the MVC Pipeline and so require manual validation using the Validate() method of the validator.
 - Uses Swagger for interactive API documentation
 - Uses MySQL as the database
+- Uses Minimal API endpoints, instead of the traditional Controller-based endpoints, for a more lightweight and efficient approach to building APIs. 

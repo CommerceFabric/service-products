@@ -1,4 +1,5 @@
 using BusinessLogicLayer;
+using CommerceFabric.ProductService.API.ApiEndpoints;
 using CommerceFabric.ProductService.API.Middleware;
 using DataAccessLayer;
 using FluentValidation.AspNetCore;
@@ -28,5 +29,8 @@ app.UseAuthorization();
 
 // Map Controllers
 app.MapControllers();
+
+// Map the Minimal API Endpoints
+app.MapProductApiEndpoints();
 
 app.Run();

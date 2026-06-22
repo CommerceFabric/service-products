@@ -14,9 +14,14 @@ namespace DataAccessLayer
     {
         public static IServiceCollection AddDataAccessLayer(this IServiceCollection services, IConfiguration configuration)
         {
+            var test = configuration.GetConnectionString("DefaultConnection");
+
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseMySQL(configuration.GetConnectionString("DefaultConnection")!);
+                options.UseMySql(
+                    configuration.GetConnectionString("DefaultConnection")!,
+                    ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection")!)
+                );
             });
 
             services.AddScoped<IProductsRepository, ProductsRepository>();
