@@ -4,6 +4,8 @@ using BusinessLogicLayer.Services;
 using BusinessLogicLayer.Validators;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CommerceFabric.ProductService.API.ApiEndpoints
 {
@@ -37,18 +39,21 @@ namespace CommerceFabric.ProductService.API.ApiEndpoints
             app.MapGet("/api/products/search/category/{category}",
                 async (string category, [FromServices] IProductsService productService) =>
                 {
-                    var products = await productService.GetProductsByCondition(p => p.Category != null && p.Category.ToString().Equals(category, StringComparison.OrdinalIgnoreCase));
+                    var products = await productService.GetProductsByCondition(
+                        p => p.ProductName != null &&
+                             EF.Functions.Like(p.Category, $"%{category}%")
+                    );
                     return Results.Ok(products);
                 });
 
             // get products by search query (searches in product name) endpoint
-            app.MapGet("/api/products/search",
+            app.MapGet("/api/products/search/{query}",
                 async (string query, [FromServices] IProductsService productService) =>
                 {
-                    var products = await productService.GetProductsByCondition(p => p.ProductName != null && p.ProductName.Contains(query, StringComparison.OrdinalIgnoreCase));
-
-
-
+                    var products = await productService.GetProductsByCondition(
+                        p => p.ProductName != null &&
+                             EF.Functions.Like(p.ProductName, $"%{query}%")
+                    );
                     return Results.Ok(products);
                 });
             #endregion
