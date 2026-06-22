@@ -29,6 +29,19 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add Cors Services
+builder.Services.AddCors(options =>
+{
+    // Configure a default CORS policy that allows any origin, method, and header
+    options.AddDefaultPolicy(builder =>
+    {
+        // todo - may want to restrict this in production to only allow specific origins, methods, and headers
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 // Build the application.
 var app = builder.Build();
 
