@@ -25,12 +25,21 @@ builder.Services.AddControllers();
 //FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 
+// Add swagger generation to create API documentation
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 // Build the application.
 var app = builder.Build();
 
 // Configure the HTTP request pipeline using the custom exception handling middleware.
 app.UseExceptionHandlingMiddleware();
 app.UseRouting();
+
+// Enable swagger UI and endpoint for API documentation
+app.UseSwagger(); // adds endpoint that can serve the swagger.json
+app.UseSwaggerUI(); // adds swagger UI to visualize and interact with the API's resources
+app.UseCors(); // Enable Cross-Origin Resource Sharing (CORS) using the configured policy, controlling which origins, methods, and headers can access this API.
 
 // Auth
 app.UseAuthentication();
