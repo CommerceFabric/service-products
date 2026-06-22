@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BusinessLogicLayer.Mappers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BusinessLogicLayer
 {
@@ -9,6 +7,10 @@ namespace BusinessLogicLayer
     {
         public static IServiceCollection AddBusinessLogicLayer(this IServiceCollection services)
         {
+            services.AddAutoMapper(
+                cfg => { },
+                typeof(ProductMappingProfile)
+            );
 
             return services;
         }
