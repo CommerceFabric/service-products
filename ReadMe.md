@@ -9,9 +9,9 @@
 
 - Seed the database using the following sql (will later be done using a startup seeder + migrations):
 ```sql
-    -- Create the database
-CREATE DATABASE IF NOT EXISTS ecommerceproductsdatabase;
-USE ecommerceproductsdatabase;
+-- Create the database
+CREATE DATABASE IF NOT EXISTS productService;
+USE productService;
 
 -- Create the products table
 CREATE TABLE IF NOT EXISTS products (
