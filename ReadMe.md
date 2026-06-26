@@ -1,13 +1,20 @@
 # Todo
 
 - Seed the DB using a startup seeder
-- Generate migrations for the database using EF Core - making it Code First instead of DB First
+- Generate migrations for the database using EF Core (Code-First approach using migrations)
+
+---
 
 # Requirements
 
-- [MySQL](https://dev.mysql.com/downloads/mysql/) Community Server, 9.7.1 or higher
+- [MySQL](https://dev.mysql.com/downloads/mysql/) Community Server 8.0 or higher
 
-- Seed the database using the following sql (will later be done using a startup seeder + migrations):
+---
+
+## Initial Database Seed (temporary manual setup)
+
+Run the following SQL to initialise and seed the database (this will later be replaced by EF Core migrations + startup seeder):
+
 ```sql
 -- Create the database
 CREATE DATABASE IF NOT EXISTS productService;
@@ -23,14 +30,14 @@ CREATE TABLE IF NOT EXISTS products (
   PRIMARY KEY (ProductID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Insert 12 sample rows into the products table with specified categories
+-- Seed data
 INSERT INTO products (ProductID, ProductName, Category, UnitPrice, QuantityInStock) VALUES
   ('1a9df78b-3f46-4c3d-9f2a-1b9f69292a77', 'Apple iPhone 15 Pro Max', 'Electronics', 1299.99, 50),
   ('2c8e8e7c-97a3-4b11-9a1b-4dbe681cfe17', 'Samsung Foldable Smart Phone 2', 'Electronics', 1499.99, 100),
   ('3f3e8b3a-4a50-4cd0-8d8e-1e178ae2cfc1', 'Ergonomic Office Chair', 'Furniture', 249.99, 25),
   ('4c9b6f71-6c5d-485f-8db2-58011a236b63', 'Coffee Table with Storage', 'Furniture', 179.99, 30),
   ('5d7e36bf-65c3-4a71-bf97-740d561d8b65', 'Samsung QLED 75 inch', 'Electronics', 1999.99, 20),
-  ('6a14f510-72c1-42c8-9a5a-8ef8f3f45a0d', 'Running Shoes', 'Furniture', 49.99, 75),
+  ('6a14f510-72c1-42c8-9a5a-8ef8f3f45a0d', 'Running Shoes', 'Accessories', 49.99, 75),
   ('7b39ef14-932b-4c84-9187-55b748d2b28f', 'Anti-Theft Laptop Backpack', 'Accessories', 59.99, 60),
   ('8c5f6e73-68fc-49d9-99b4-aecc3706a4f4', 'LG OLED 65 inch', 'Electronics', 1499.99, 15),
   ('9e7e7085-6f4e-4921-8f15-c59f084080f9', 'Modern Dining Table', 'Furniture', 699.99, 10),
@@ -38,7 +45,9 @@ INSERT INTO products (ProductID, ProductName, Category, UnitPrice, QuantityInSto
   ('11f2e86a-9d5d-42f9-b3c2-3e4d652e3df8', 'Executive Office Desk', 'Furniture', 299.99, 18),
   ('12b369b7-9101-41b1-a653-6c6c9a4fe1e4', 'Breville Smart Blender', 'HomeAppliances', 129.99, 50);
 ```
-Now add the connection string into the secrets.json, eg
+
+# Application Configuration
+## User Secrets (Development only)
 ```json
 {
   "ConnectionStrings": {
@@ -47,47 +56,75 @@ Now add the connection string into the secrets.json, eg
 }
 ```
 
-# Running through docker
+## Production / Docker Environment Variables
 
-- First create a network for the micro-service and the MySQL container to communicate with each other:
-```docker network create productsmicroservice-network```
+When running in Docker or release mode, user secrets are not available. Use environment variables instead:
 
-- Can then launch a MySQL container using the following command (this will create a MySQL container with the root password set to 'admin', and expose port 3306 for database connections):
-```docker run -it  -e MYSQL_ROOT_PASSWORD='admin' -p 3306:3306 --hostname=mysql-host-productmicroservice --network=productsmicroservice-network mysql```
-    - **If MySQL is already running locally on port 3306, it must be stopped before running this command.**
+- `COMMERCEFABRIC_PRODUCTSERVICE_DB_HOST`
+- `COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD`
 
-- Now build docker image for the micro-service using the following command (this will build a docker image named 'productsmicroservice' from the Dockerfile in the current directory):
-```docker build -t danielmusselwhite/commercefabric_product_microservice:1.0.0 -f .\CommerceFabric.ProductService\Dockerfile .```
+Default values for other settings are defined in the appsettings.json, so are not required to be set.
 
-- Now run the docker image for the micro-service using the following command (this will run the created and pushed image from the 'productsmicroservice' image, and expose port 8080 for API access):
-```docker run -p 8080:8080 --network=productsmicroservice-network danielmusselwhite/commercefabric_product_microservice:1.0.0```
+## Running through Docker
+1. Create network
+```bash
+docker network create productsmicroservice-network
+```
+2. Run MySQL container
+```bash
+docker run -d --name mysql-productservice --network productsmicroservice-network -e MYSQL_ROOT_PASSWORD=admin -e MYSQL_DATABASE=productService mysql:9.7.1
+```
 
-- Now push it to the remote repository (this will push the tagged image 'danielmusselwhite/commercefabric_product_microservice:1.0.0' to Docker Hub):
-```docker push danielmusselwhite/commercefabric_product_microservice:1.0.0```
+Note: MySQL must NOT already be running locally on port 3306 unless you change the port mapping.
+
+3. Build microservice image
+```bash
+docker build -t danielmusselwhite/commercefabric_product_microservice:1.0.0 -f .\CommerceFabric.ProductService\Dockerfile .
+```
+
+4. Run microservice
+```bash
+docker run -p 8080:8080 --network productsmicroservice-network danielmusselwhite/commercefabric_product_microservice:1.0.0
+```
+
+5. Push to Docker Hub
+```bash
+docker push danielmusselwhite/commercefabric_product_microservice:1.0.0
+```
 
 # Technical Info
-
 ## Architecture
-- Uses the Layered Architecture (API / BusinessLogic / DataAccess) pattern, which separates the application into presentation, business, and persistence layers.
-    - API – Exposes endpoints and handles request/response mapping.
-    - BusinessLogic – Contains application workflows, validation, and business rules.
-    - DataAccess – Manages database interactions, repositories, and persistence concerns.
 
-- In recent years, Clean Architecture has gained popularity for its emphasis on separation of concerns and dependency inversion, though these benefits come with additional complexity.
-    - I implemented the [User Service](https://github.com/CommerceFabric/service-user) micro-service using this approach.
-    - But for this micro-service, I intentionally chose the Layered Architecture pattern, as its lower complexity makes it well-suited to small and medium-sized applications.
+This service uses a Layered Architecture pattern:
 
-## Technical Stack
+### API Layer
+- Exposes endpoints
+- Handles request/response mapping
+### Business Logic Layer
+- Application workflows
+- Validation and business rules
+### Data Access Layer
+- Database interactions
+- Repository implementations
+- Persistence concerns
+### Architecture Note
 
-- Uses Entity Framework Core (EF) as the ORM for database interactions, providing a higher-level abstraction over raw SQL queries.
-    - As EF is better for change tracking (migrations), and has LINQ support
-    - And is more standard than the Dapper micro-ORM that I demonstrated in [User Service](https://github.com/CommerceFabric/service-user), which is more suited for performance-critical scenarios.
+A Clean Architecture approach is also used in other services (e.g. User Service), but this service intentionally uses a Layered Architecture to reduce complexity for a smaller bounded context.
+
+### Technical Stack
+- Entity Framework Core (ORM)
+    - Change tracking
+    - LINQ support
+    - Migrations (Code-First)
 - Dependency Injection
-- Uses AutoMapper
-- Layered Architecture Principles (split sub-projects: API, BusinessLogic, DataAccess)
-- Has injected Exception Handling Middleware
-- Has Fluent Validation for confirming correctness of DTO's
-    - Unlike the [User Service](https://github.com/CommerceFabric/service-user), which has Controller based API which comes from the MVC Pipeline and so are automatically validated by the Fluent Validation Middleware, this micro-service uses Minimal API endpoints, which do not come from the MVC Pipeline and so require manual validation using the Validate() method of the validator.
-- Uses Swagger for interactive API documentation
-- Uses MySQL as the database
-- Uses Minimal API endpoints, instead of the traditional Controller-based endpoints, for a more lightweight and efficient approach to building APIs. 
+- AutoMapper
+- Fluent Validation (manual validation for Minimal APIs)
+- Exception Handling Middleware
+- Swagger / OpenAPI
+- MySQL database
+- Minimal API endpoints (lightweight alternative to MVC controllers)
+
+### Design Notes
+- Minimal APIs are used instead of Controllers
+- FluentValidation is manually triggered due to lack of MVC pipeline integration
+- EF Core is preferred over Dapper for maintainability and migration support in this service

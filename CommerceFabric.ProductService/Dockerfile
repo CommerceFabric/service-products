@@ -27,4 +27,6 @@ RUN dotnet publish "./CommerceFabric.ProductService.API.csproj" -c $BUILD_CONFIG
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV COMMERCEFABRIC_PRODUCTSERVICE_DB_HOST=mysql-productservice
+ENV COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD=admin
 ENTRYPOINT ["dotnet", "CommerceFabric.ProductService.API.dll"]

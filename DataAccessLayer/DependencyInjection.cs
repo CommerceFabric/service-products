@@ -14,13 +14,17 @@ namespace DataAccessLayer
     {
         public static IServiceCollection AddDataAccessLayer(this IServiceCollection services, IConfiguration configuration)
         {
-            var test = configuration.GetConnectionString("DefaultConnection");
+            // Get connection string and replace the placeholders with actual values from environment variables if they exist
+            var connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            connectionString = connectionString.Replace("$COMMERCEFABRIC_PRODUCTSERVICE_DB_HOST", Environment.GetEnvironmentVariable("COMMERCEFABRIC_PRODUCTSERVICE_DB_HOST") ?? "localhost");
+            connectionString = connectionString.Replace("$COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD", Environment.GetEnvironmentVariable("COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD") ?? "admin");
 
+            // Add the ApplicationDbContext to the service collection with MySQL configuration
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseMySql(
-                    configuration.GetConnectionString("DefaultConnection")!,
-                    ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection")!)
+                    connectionString,
+                    ServerVersion.AutoDetect(connectionString)
                 );
             });
 
