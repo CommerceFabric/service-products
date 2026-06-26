@@ -40,14 +40,16 @@ Default values for other settings are defined in the appsettings.json, so are no
 ## Running through Docker
 - Build and run the docker-compose file
 ```bash
-docker-compose -f Resources/docker/docker-compose.yaml up --build
+docker-compose -f docker-compose.yaml up --build
 ```
+- Can access the service's Swagger UI at http://localhost:8080/swagger/index.html
+
 - stop the containers
 ```bash
-docker-compose -f Resources/docker/docker-compose.yaml down
+docker-compose -f docker-compose.yaml down
 ```
 
-- If you wish to run docker manually instead of through docker-compose, or wish to push the docker image to Docker Hub, follow the instructions in [ManualDockerInstructions.md](Resources/Docs/ManualDockerInstructions.md)
+- If you wish to run docker manually instead of through docker-compose, or wish to push the docker image to Docker Hub, follow the instructions in [ManualDockerInstructions.md](Docs/ManualDockerInstructions.md)
 
 # Technical Info
 ## Architecture
