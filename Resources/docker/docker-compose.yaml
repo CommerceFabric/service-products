@@ -1,0 +1,34 @@
+version: "5.2"
+
+services:
+  mysql-productservice:
+    image: mysql:9.7.1
+    container_name: mysql-productservice
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: productService
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./Resources/docker/mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - productsmicroservice-network
+    restart: unless-stopped
+
+  productservice:
+    image: danielmusselwhite/commercefabric_product_microservice:1.0.0
+    container_name: productservice
+    build:
+      context: .
+      dockerfile: CommerceFabric.ProductService/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - productsmicroservice-network
+    depends_on:
+      - mysql-productservice
+    restart: unless-stopped
+
+networks:
+  productsmicroservice-network:
+    external: false

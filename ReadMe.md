@@ -14,7 +14,7 @@
 ## Initial Database Seed (temporary manual setup)
 
 Run the following SQL to initialise and seed the database (this will later be replaced by EF Core migrations + startup seeder):
-- [db_products_seed.sql](Resources\dbSeed.sql)
+- [db_products_seed.sql](Resources/docker/mysql-init/db_products_seed.sql)
 
 # Application Configuration
 ## User Secrets (Development only)
@@ -36,31 +36,16 @@ When running in Docker or release mode, user secrets are not available. Use envi
 Default values for other settings are defined in the appsettings.json, so are not required to be set.
 
 ## Running through Docker
-1. Create network
+- Build and run the docker-compose file
 ```bash
-docker network create productsmicroservice-network
+docker-compose -f Resources/docker/docker-compose.yaml up --build
 ```
-2. Run MySQL container
+- stop the containers
 ```bash
-docker run -d --name mysql-productservice --network productsmicroservice-network -e MYSQL_ROOT_PASSWORD=admin -e MYSQL_DATABASE=productService -v ./Resources/mysql-init:/docker-entrypoint-initdb.d -p 3306:3306 mysql:9.7.1
-```
-
-Note: MySQL must NOT already be running locally on port 3306 unless you change the port mapping.
-
-3. Build microservice image
-```bash
-docker build -t danielmusselwhite/commercefabric_product_microservice:1.0.0 -f .\CommerceFabric.ProductService\Dockerfile .
+docker-compose -f Resources/docker/docker-compose.yaml down
 ```
 
-4. Run microservice
-```bash
-docker run -p 8080:8080 --network productsmicroservice-network danielmusselwhite/commercefabric_product_microservice:1.0.0
-```
-
-5. Push to Docker Hub
-```bash
-docker push danielmusselwhite/commercefabric_product_microservice:1.0.0
-```
+- If you wish to run docker manually instead of through docker-compose, or wish to push the docker image to Docker Hub, follow the instructions in [ManualDockerInstructions.md](Resources/Docs/ManualDockerInstructions.md)
 
 # Technical Info
 ## Architecture
