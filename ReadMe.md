@@ -8,6 +8,8 @@
 # Requirements
 
 - [MySQL](https://dev.mysql.com/downloads/mysql/) Community Server 8.0 or higher
+- [Docker](https://www.docker.com/products/docker-desktop/) Desktop 4.79 or higher
+- [Docker Compose](https://docs.docker.com/compose/install/) 5.1.4 or higher
 
 ---
 
