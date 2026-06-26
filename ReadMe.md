@@ -39,6 +39,24 @@ INSERT INTO products (ProductID, ProductName, Category, UnitPrice, QuantityInSto
   ('12b369b7-9101-41b1-a653-6c6c9a4fe1e4', 'Breville Smart Blender', 'HomeAppliances', 129.99, 50);
 ```
 
+# Running through docker
+
+- First create a network for the micro-service and the MySQL container to communicate with each other:
+```docker network create productsmicroservice-network```
+
+- Can then launch a MySQL container using the following command (this will create a MySQL container with the root password set to 'admin', and expose port 3306 for database connections):
+```docker run -it  -e MYSQL_ROOT_PASSWORD='admin' -p 3306:3306 --hostname=mysql-host-productmicroservice --network=productsmicroservice-network mysql```
+    - **If MySQL is already running locally on port 3306, it must be stopped before running this command.**
+
+- Now build docker image for the micro-service using the following command (this will build a docker image named 'productsmicroservice' from the Dockerfile in the current directory):
+```docker build -t danielmusselwhite/commercefabric_product_microservice:1.0.0 -f .\CommerceFabric.ProductService\Dockerfile .```
+
+- Now run the docker image for the micro-service using the following command (this will run the created and pushed image from the 'productsmicroservice' image, and expose port 8080 for API access):
+```docker run -p 8080:8080 --network=productsmicroservice-network danielmusselwhite/commercefabric_product_microservice:1.0.0```
+
+- Now push it to the remote repository (this will push the tagged image 'danielmusselwhite/commercefabric_product_microservice:1.0.0' to Docker Hub):
+```docker push danielmusselwhite/commercefabric_product_microservice:1.0.0```
+
 # Technical Info
 
 ## Architecture
