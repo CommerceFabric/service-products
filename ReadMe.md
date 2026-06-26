@@ -9,9 +9,9 @@
 
 - Seed the database using the following sql (will later be done using a startup seeder + migrations):
 ```sql
-    -- Create the database
-CREATE DATABASE IF NOT EXISTS ecommerceproductsdatabase;
-USE ecommerceproductsdatabase;
+-- Create the database
+CREATE DATABASE IF NOT EXISTS productService;
+USE productService;
 
 -- Create the products table
 CREATE TABLE IF NOT EXISTS products (
@@ -37,6 +37,14 @@ INSERT INTO products (ProductID, ProductName, Category, UnitPrice, QuantityInSto
   ('10d7b110-ecdb-4921-85a4-58a5d1b32bf4', 'PlayStation 5', 'Electronics', 499.99, 40),
   ('11f2e86a-9d5d-42f9-b3c2-3e4d652e3df8', 'Executive Office Desk', 'Furniture', 299.99, 18),
   ('12b369b7-9101-41b1-a653-6c6c9a4fe1e4', 'Breville Smart Blender', 'HomeAppliances', 129.99, 50);
+```
+Now add the connection string into the secrets.json, eg
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=3306;Database=productService;User=root;Password=yourMySqlPasswordHere;"
+  }
+}
 ```
 
 # Running through docker
