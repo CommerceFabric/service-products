@@ -12,7 +12,7 @@ services:
     volumes:
       - ./Resources/docker/mysql-init:/docker-entrypoint-initdb.d
     networks:
-      - productsmicroservice-network
+      - commercefabric-network
     restart: unless-stopped
 
   productservice:
@@ -24,11 +24,11 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - productsmicroservice-network
+      - commercefabric-network
     depends_on:
       - mysql-productservice
     restart: unless-stopped
 
 networks:
-  productsmicroservice-network:
+  commercefabric-network:
     external: false
