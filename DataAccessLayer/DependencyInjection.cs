@@ -18,6 +18,9 @@ namespace DataAccessLayer
             var connectionString = configuration.GetConnectionString("DefaultConnection")!;
             connectionString = connectionString.Replace("$COMMERCEFABRIC_PRODUCTSERVICE_DB_HOST", Environment.GetEnvironmentVariable("COMMERCEFABRIC_PRODUCTSERVICE_DB_HOST") ?? "localhost");
             connectionString = connectionString.Replace("$COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD", Environment.GetEnvironmentVariable("COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD") ?? "admin");
+            connectionString = connectionString.Replace("$COMMERCEFABRIC_PRODUCTSERVICE_DB_NAME", Environment.GetEnvironmentVariable("COMMERCEFABRIC_PRODUCTSERVICE_DB_NAME") ?? "productDB");
+            connectionString = connectionString.Replace("$COMMERCEFABRIC_PRODUCTSERVICE_DB_USER", Environment.GetEnvironmentVariable("COMMERCEFABRIC_PRODUCTSERVICE_DB_USER") ?? "root");
+            connectionString = connectionString.Replace("$COMMERCEFABRIC_PRODUCTSERVICE_DB_PORT", Environment.GetEnvironmentVariable("COMMERCEFABRIC_PRODUCTSERVICE_DB_PORT") ?? "3306");
 
             // Add the ApplicationDbContext to the service collection with MySQL configuration
             services.AddDbContext<ApplicationDbContext>(options =>
