@@ -75,12 +75,16 @@ namespace BusinessLogicLayer.Services
             // if product successfully deleted, publish message to RabbitMQ
             if(productDeleted)
             {
-                string routingKey = "product.delete";
+                var headers = new Dictionary<string, object>
+                {
+                    { "event", "product.delete" },
+                    { "RowCount", 1  }
+                };
                 var message = new ProductDeleteMessage
                 {
                     ProductID = productID
                 };
-                await _rabbitMQPublisher.Publish(routingKey, message);
+                await _rabbitMQPublisher.Publish(headers, message);
             }
             
             return productDeleted;
@@ -148,14 +152,19 @@ namespace BusinessLogicLayer.Services
             // if the product name has changed, publish a message to RabbitMQ
             if (productNameChanged)
             {
-                string routingKey = "product.update.name"; // the routing key to use for the message (eg product.update.name)
+                var headers = new Dictionary<string, object>
+                {
+                    { "event", "product.update" },
+                    { "field", "name" },
+                    { "RowCount", 1  }
+                };
                 var message = new ProductNameUpdateMessage
                 {
                     ProductID = updatedProduct!.ProductID,
                     OldProductName = existingProduct.ProductName,
                     NewProductName = updatedProduct.ProductName
                 };
-                await _rabbitMQPublisher.Publish(routingKey, message);
+                await _rabbitMQPublisher.Publish(headers, message);
             }
 
             var productResponse = _mapper.Map<ProductResponse>(updatedProduct);

@@ -6,6 +6,6 @@ namespace BusinessLogicLayer.RabbitMQ
 {
     public interface IRabbitMQPublisher
     {
-        Task Publish<TMessage>(string routingKey, TMessage message);
+        Task Publish<TMessage>(Dictionary<string, object> headers, TMessage message);
     }
 }

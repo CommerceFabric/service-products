@@ -25,7 +25,7 @@ namespace BusinessLogicLayer.RabbitMQ
             _connection?.Dispose();
         }
 
-        public async Task Publish<TMessage>(string routingKey, TMessage message)
+        public async Task Publish<TMessage>(Dictionary<string, object> headers, TMessage message)
         {
             await EnsureConnectedAsync(); // Ensure that the channel is created and connected to RabbitMQ before publishing the message (has been lazy loaded)
 
@@ -36,14 +36,22 @@ namespace BusinessLogicLayer.RabbitMQ
             // Declare the exchange
             await _channel!.ExchangeDeclareAsync(
                 exchange: exchangeName, // the name of the exchange to declare (eg products.exchange)
-                type: ExchangeType.Direct, // the type of the exchange (eg direct, fanout, topic, headers)
+                type: ExchangeType.Headers, // the type of the exchange (eg direct, fanout, topic, headers)
                 durable: true // exchange should survive a broker restart
             );
+
+            // Add headers to the message
+            var properties = new BasicProperties
+            {
+                Headers = headers
+            };
 
             // Publish the message to the exchange with the specified routing key
             await _channel!.BasicPublishAsync(
                 exchange: exchangeName, // the name of the exchange to publish to (eg products.exchange)
-                routingKey: routingKey, // the routing key to use for the message (eg product.created, product.updated, etc.)
+                routingKey: string.Empty, // the routing key is ignored for headers exchange
+                mandatory: false, // if true, the message will be returned to the publisher if it cannot be routed to a queue (not needed for headers exchange)
+                basicProperties: properties, // use headers
                 body: body // the message body as a byte array
             );
         }
