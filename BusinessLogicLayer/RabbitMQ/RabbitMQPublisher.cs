@@ -10,8 +10,8 @@ namespace BusinessLogicLayer.RabbitMQ
     public class RabbitMQPublisher : IRabbitMQPublisher, IDisposable
     {
         private readonly IConfiguration _configuration;
-        private IChannel _channel;
-        private IConnection _connection;
+        private IChannel? _channel;
+        private IConnection? _connection;
         private readonly SemaphoreSlim _lock = new(1, 1); // Semaphore to ensure thread safety when creating the channel (has 1 permit, so only one thread can enter at a time)
 
         public RabbitMQPublisher(IConfiguration configuration)
@@ -21,8 +21,8 @@ namespace BusinessLogicLayer.RabbitMQ
 
         public void Dispose()
         {
-            _channel.Dispose();
-            _connection.Dispose();
+            _channel?.Dispose();
+            _connection?.Dispose();
         }
 
         public async Task Publish<ProductNameUpdateMessage>(string routingKey, ProductNameUpdateMessage message)
@@ -34,14 +34,14 @@ namespace BusinessLogicLayer.RabbitMQ
             string exchangeName = _configuration["RABBITMQ_PRODUCTS_EXCHANGE"]!; // the name of the exchange to publish to (eg products.exchange)
 
             // Declare the exchange
-            await _channel.ExchangeDeclareAsync(
+            await _channel!.ExchangeDeclareAsync(
                 exchange: exchangeName, // the name of the exchange to declare (eg products.exchange)
                 type: ExchangeType.Direct, // the type of the exchange (eg direct, fanout, topic, headers)
                 durable: true // exchange should survive a broker restart
             );
 
             // Publish the message to the exchange with the specified routing key
-            await _channel.BasicPublishAsync(
+            await _channel!.BasicPublishAsync(
                 exchange: exchangeName, // the name of the exchange to publish to (eg products.exchange)
                 routingKey: routingKey, // the routing key to use for the message (eg product.created, product.updated, etc.)
                 body: body // the message body as a byte array
