@@ -13,7 +13,8 @@
         "RABBITMQ_HOST": "rabbitmq",
         "RABBITMQ_PORT": "5672",
         "RABBITMQ_USER": "admin",
-        "RABBITMQ_PASSWORD": "admin"
+        "RABBITMQ_PASSWORD": "admin",
+        "RABBITMQ_PRODUCTS_EXCHANGE": "products.exchange"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5021"
@@ -31,7 +32,8 @@
         "RABBITMQ_HOST": "rabbitmq",
         "RABBITMQ_PORT": "5672",
         "RABBITMQ_USER": "admin",
-        "RABBITMQ_PASSWORD": "admin"
+        "RABBITMQ_PASSWORD": "admin",
+        "RABBITMQ_PRODUCTS_EXCHANGE": "products.exchange"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7171;http://localhost:5021",

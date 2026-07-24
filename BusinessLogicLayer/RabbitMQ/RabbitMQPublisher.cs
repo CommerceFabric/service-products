@@ -25,13 +25,13 @@ namespace BusinessLogicLayer.RabbitMQ
             _connection.Dispose();
         }
 
-        public async Task Publish<T>(string routingKey, T message)
+        public async Task Publish<ProductNameUpdateMessage>(string routingKey, ProductNameUpdateMessage message)
         {
             await EnsureConnectedAsync(); // Ensure that the channel is created and connected to RabbitMQ before publishing the message (has been lazy loaded)
 
             var body = Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(message)); // Serialize the message to JSON and convert it to a byte array
             
-            string exchangeName = "products.exchange"; // the name of the exchange to publish to (eg products.exchange)
+            string exchangeName = _configuration["RABBITMQ_PRODUCTS_EXCHANGE"]!; // the name of the exchange to publish to (eg products.exchange)
 
             // Declare the exchange
             await _channel.ExchangeDeclareAsync(

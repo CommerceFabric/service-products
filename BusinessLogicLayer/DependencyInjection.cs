@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.Mappers;
+using BusinessLogicLayer.RabbitMQ;
 using BusinessLogicLayer.ServiceContracts;
 using BusinessLogicLayer.Services;
 using FluentValidation;
@@ -20,6 +21,9 @@ namespace BusinessLogicLayer
 
             // Add services to the DI container
             services.AddScoped<IProductsService, ProductsService>();
+
+            // Add RabbitMQ as singleton because we want to reuse the same connection and channel for publishing messages
+            services.AddSingleton<IRabbitMQPublisher, RabbitMQPublisher>();
 
             return services;
         }

@@ -36,4 +36,5 @@ ENV RABBITMQ_HOST=rabbitmq
 ENV RABBITMQ_PORT=5672
 ENV RABBITMQ_USER=admin
 ENV RABBITMQ_PASSWORD=admin
+ENV RABBITMQ_PRODUCTS_EXCHANGE=products.exchange
 ENTRYPOINT ["dotnet", "CommerceFabric.ProductService.API.dll"]

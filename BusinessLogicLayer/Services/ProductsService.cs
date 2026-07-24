@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.DTO;
+using BusinessLogicLayer.RabbitMQ;
 using BusinessLogicLayer.ServiceContracts;
 using BusinessLogicLayer.Validators;
 using DataAccessLayer.Entities;
@@ -17,6 +18,7 @@ namespace BusinessLogicLayer.Services
         private readonly IProductsRepository _productsRepository;
         private readonly ProductAddRequestValidator _productAddRequestValidator;
         private readonly ProductUpdateRequestValidator _productUpdateRequestValidator;
+        private readonly IRabbitMQPublisher _rabbitMQPublisher;
 
         /// <summary>
         /// The constructor for the ProductsService class, which initializes the dependencies for the service.
@@ -25,12 +27,14 @@ namespace BusinessLogicLayer.Services
         /// <param name="productsRepository">Dependency Injected IProductsRepository instance</param>
         /// <param name="productAddRequestValidator">Dependency Injected ProductAddRequestValidator instance - as we use Minimal API, not Controller based API, so we need to manually validate requests</param>
         /// <param name="productUpdateRequestValidator">Dependency Injected ProductUpdateRequestValidator instance - as we use Minimal API, not Controller based API, so we need to manually validate requests</param>
-        public ProductsService(IMapper mapper, IProductsRepository productsRepository, ProductAddRequestValidator productAddRequestValidator, ProductUpdateRequestValidator productUpdateRequestValidator)
+        /// <param name="rabbitMQPublisher">Dependency Injected IRabbitMQPublisher instance</param>
+        public ProductsService(IMapper mapper, IProductsRepository productsRepository, ProductAddRequestValidator productAddRequestValidator, ProductUpdateRequestValidator productUpdateRequestValidator, IRabbitMQPublisher rabbitMQPublisher)
         {
             _mapper = mapper;
             _productsRepository = productsRepository;
             _productAddRequestValidator = productAddRequestValidator;
             _productUpdateRequestValidator = productUpdateRequestValidator;
+            _rabbitMQPublisher = rabbitMQPublisher;
         }
 
         public async Task<ProductResponse?> AddProduct(ProductAddRequest productAddRequest)
@@ -110,11 +114,37 @@ namespace BusinessLogicLayer.Services
                 string errors = string.Join(", ", validationResult.Errors.Select(temp => temp.ErrorMessage));
                 throw new ArgumentException(errors);
             }
+
+            // as we are doing an update, we need to check if the product exists in the database
+            var existingProduct = await _productsRepository.GetProductByCondition(p => p.ProductID == productUpdateRequest.ProductID);
+            if (existingProduct == null)
+            {
+                throw new ArgumentException($"Product with ID {productUpdateRequest.ProductID} does not exist.");
+            }
+            var productNameChanged = existingProduct.ProductName != productUpdateRequest.ProductName; // use this later to determine if we publish a message to RabbitMQ
             #endregion
 
 
             var product = _mapper.Map<Product>(productUpdateRequest);
             var updatedProduct = await _productsRepository.UpdateProduct(product);
+            if(updatedProduct == null)
+            {
+                throw new Exception($"Failed to update product with ID {productUpdateRequest.ProductID}.");
+            }
+
+            // if the product name has changed, publish a message to RabbitMQ
+            if (productNameChanged)
+            {
+                string routingKey = "product.update.name"; // the routing key to use for the message (eg product.update.name)
+                var message = new ProductNameUpdateMessage
+                {
+                    ProductID = updatedProduct!.ProductID,
+                    OldProductName = existingProduct.ProductName,
+                    NewProductName = updatedProduct.ProductName
+                };
+                await _rabbitMQPublisher.Publish(routingKey, message);
+            }
+
             var productResponse = _mapper.Map<ProductResponse>(updatedProduct);
             return productResponse;
         }
