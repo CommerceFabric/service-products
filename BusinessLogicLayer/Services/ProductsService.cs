@@ -138,7 +138,6 @@ namespace BusinessLogicLayer.Services
             {
                 throw new ArgumentException($"Product with ID {productUpdateRequest.ProductID} does not exist.");
             }
-            var productNameChanged = existingProduct.ProductName != productUpdateRequest.ProductName; // use this later to determine if we publish a message to RabbitMQ
             #endregion
 
 
@@ -149,23 +148,14 @@ namespace BusinessLogicLayer.Services
                 throw new Exception($"Failed to update product with ID {productUpdateRequest.ProductID}.");
             }
 
-            // if the product name has changed, publish a message to RabbitMQ
-            if (productNameChanged)
+            // publish a message to RabbitMQ
+            var headers = new Dictionary<string, object>
             {
-                var headers = new Dictionary<string, object>
-                {
-                    { "event", "product.update" },
-                    { "field", "name" },
-                    { "RowCount", 1  }
-                };
-                var message = new ProductNameUpdateMessage
-                {
-                    ProductID = updatedProduct!.ProductID,
-                    OldProductName = existingProduct.ProductName,
-                    NewProductName = updatedProduct.ProductName
-                };
-                await _rabbitMQPublisher.Publish(headers, message);
-            }
+                { "event", "product.update" },
+                { "RowCount", 1  }
+            };
+            
+            await _rabbitMQPublisher.Publish(headers, product);
 
             var productResponse = _mapper.Map<ProductResponse>(updatedProduct);
             return productResponse;
