@@ -9,7 +9,11 @@
         "COMMERCEFABRIC_PRODUCTSERVICE_DB_PORT": "3306",
         "COMMERCEFABRIC_PRODUCTSERVICE_DB_NAME": "productDB",
         "COMMERCEFABRIC_PRODUCTSERVICE_DB_USER": "root",
-        "COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD": "admin"
+        "COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD": "admin",
+        "RABBITMQ_HOST": "rabbitmq",
+        "RABBITMQ_PORT": "5672",
+        "RABBITMQ_USER": "admin",
+        "RABBITMQ_PASSWORD": "admin"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5021"
@@ -23,7 +27,11 @@
         "COMMERCEFABRIC_PRODUCTSERVICE_DB_PORT": "3306",
         "COMMERCEFABRIC_PRODUCTSERVICE_DB_NAME": "productDB",
         "COMMERCEFABRIC_PRODUCTSERVICE_DB_USER": "root",
-        "COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD": "admin"
+        "COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD": "admin",
+        "RABBITMQ_HOST": "rabbitmq",
+        "RABBITMQ_PORT": "5672",
+        "RABBITMQ_USER": "admin",
+        "RABBITMQ_PASSWORD": "admin"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7171;http://localhost:5021",
