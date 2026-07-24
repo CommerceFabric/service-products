@@ -25,7 +25,7 @@ namespace BusinessLogicLayer.RabbitMQ
             _connection?.Dispose();
         }
 
-        public async Task Publish<ProductNameUpdateMessage>(string routingKey, ProductNameUpdateMessage message)
+        public async Task Publish<TMessage>(string routingKey, TMessage message)
         {
             await EnsureConnectedAsync(); // Ensure that the channel is created and connected to RabbitMQ before publishing the message (has been lazy loaded)
 

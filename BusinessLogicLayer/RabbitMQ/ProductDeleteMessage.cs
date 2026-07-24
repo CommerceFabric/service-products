@@ -4,8 +4,8 @@ using System.Text;
 
 namespace BusinessLogicLayer.RabbitMQ
 {
-    public interface IRabbitMQPublisher
+    public record ProductDeleteMessage
     {
-        Task Publish<TMessage>(string routingKey, TMessage message);
+        public Guid ProductID { get; init; }
     }
 }

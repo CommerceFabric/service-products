@@ -70,7 +70,20 @@ namespace BusinessLogicLayer.Services
                 throw new ArgumentException($"Product with ID {productID} does not exist.");
             #endregion
 
-            return await _productsRepository.DeleteProduct(productID);
+            var productDeleted = await _productsRepository.DeleteProduct(productID);
+
+            // if product successfully deleted, publish message to RabbitMQ
+            if(productDeleted)
+            {
+                string routingKey = "product.delete";
+                var message = new ProductDeleteMessage
+                {
+                    ProductID = productID
+                };
+                await _rabbitMQPublisher.Publish(routingKey, message);
+            }
+            
+            return productDeleted;
         }
 
         public async Task<ProductResponse?> GetProductByCondition(Expression<Func<Product, bool>> condition)
