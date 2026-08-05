@@ -1,9 +1,6 @@
-# Todo
+# CI/CD workflow documentation
 
-- Seed the DB using a startup seeder
-- Generate migrations for the database using EF Core (Code-First approach using migrations)
-
----
+- [Github Actions How To](Docs/GitHubActionsHowTo.md)
 
 # Requirements
 
