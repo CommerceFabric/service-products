@@ -2,4 +2,5 @@
   <Project Path="BusinessLogicLayer/BusinessLogicLayer.csproj" Id="9fc941f4-d319-4549-a907-eb536ab19ce6" />
   <Project Path="CommerceFabric.ProductService/CommerceFabric.ProductService.API.csproj" />
   <Project Path="DataAccessLayer/DataAccessLayer.csproj" Id="07f8d98d-8258-44c1-8db5-f05babec880d" />
+  <Project Path="ProductServiceTests/ProductServiceTests.csproj" Id="5e0ace57-ac53-40bf-826f-f4f466fe241b" />
 </Solution>
