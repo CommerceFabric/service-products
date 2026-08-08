@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.DTO;
 using BusinessLogicLayer.RabbitMQ;
+using BusinessLogicLayer.ServiceBus;
 using BusinessLogicLayer.ServiceContracts;
 using BusinessLogicLayer.Validators;
 using DataAccessLayer.Entities;
 using DataAccessLayer.RepositoryContracts;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.Azure.Amqp.Framing;
 using System.Linq.Expressions;
 
 namespace BusinessLogicLayer.Services
@@ -19,6 +21,7 @@ namespace BusinessLogicLayer.Services
         private readonly ProductAddRequestValidator _productAddRequestValidator;
         private readonly ProductUpdateRequestValidator _productUpdateRequestValidator;
         private readonly IRabbitMQPublisher _rabbitMQPublisher;
+        private readonly IServiceBusPublisher _serviceBusPublisher;
 
         /// <summary>
         /// The constructor for the ProductsService class, which initializes the dependencies for the service.
@@ -28,13 +31,15 @@ namespace BusinessLogicLayer.Services
         /// <param name="productAddRequestValidator">Dependency Injected ProductAddRequestValidator instance - as we use Minimal API, not Controller based API, so we need to manually validate requests</param>
         /// <param name="productUpdateRequestValidator">Dependency Injected ProductUpdateRequestValidator instance - as we use Minimal API, not Controller based API, so we need to manually validate requests</param>
         /// <param name="rabbitMQPublisher">Dependency Injected IRabbitMQPublisher instance</param>
-        public ProductsService(IMapper mapper, IProductsRepository productsRepository, ProductAddRequestValidator productAddRequestValidator, ProductUpdateRequestValidator productUpdateRequestValidator, IRabbitMQPublisher rabbitMQPublisher)
+        /// <param name="serviceBusPublisher">Dependency Injected IServiceBusPublisher instance</param>
+        public ProductsService(IMapper mapper, IProductsRepository productsRepository, ProductAddRequestValidator productAddRequestValidator, ProductUpdateRequestValidator productUpdateRequestValidator, IRabbitMQPublisher rabbitMQPublisher, IServiceBusPublisher serviceBusPublisher)
         {
             _mapper = mapper;
             _productsRepository = productsRepository;
             _productAddRequestValidator = productAddRequestValidator;
             _productUpdateRequestValidator = productUpdateRequestValidator;
             _rabbitMQPublisher = rabbitMQPublisher;
+            _serviceBusPublisher = serviceBusPublisher;
         }
 
         public async Task<ProductResponse?> AddProduct(ProductAddRequest productAddRequest)
@@ -156,6 +161,7 @@ namespace BusinessLogicLayer.Services
             };
             
             await _rabbitMQPublisher.Publish(headers, product);
+            await _serviceBusPublisher.Publish(headers, product);
 
             var productResponse = _mapper.Map<ProductResponse>(updatedProduct);
             return productResponse;

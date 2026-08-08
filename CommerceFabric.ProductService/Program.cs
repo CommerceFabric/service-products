@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add my project services to the container.
 builder.Services.AddDataAccessLayer(builder.Configuration);
-builder.Services.AddBusinessLogicLayer();
+builder.Services.AddBusinessLogicLayer(builder.Configuration);
 
 // Required to allow for enums as strings in the DTOs passed to the Minimal API Endpoints
 builder.Services.ConfigureHttpJsonOptions(options =>
