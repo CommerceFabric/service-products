@@ -29,7 +29,7 @@ namespace BusinessLogicLayer
             services.AddSingleton<IRabbitMQPublisher, RabbitMQPublisher>();
 
             // Add ServiceBus 
-            var serviceBusConnectionString = configuration["ServiceBus:ConnectionString"];
+            var serviceBusConnectionString = configuration["ProductsServiceBus:ConnectionString"];
             serviceBusConnectionString = serviceBusConnectionString!.Replace("$SERVICEBUS_CONNECTION_STRING", 
                 Environment.GetEnvironmentVariable("SERVICEBUS_CONNECTION_STRING") ?? string.Empty);
             services.AddSingleton( _ =>
