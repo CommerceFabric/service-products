@@ -21,7 +21,7 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore CommerceFabric.ProductService.slnx
 
       - name: Run tests
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test CommerceFabric.ProductService.slnx --no-restore --verbosity normal
