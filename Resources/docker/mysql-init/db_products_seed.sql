@@ -1,6 +1,6 @@
 -- Create the database
-CREATE DATABASE IF NOT EXISTS productService;
-USE productService;
+CREATE DATABASE IF NOT EXISTS productDB;
+USE productDB;
 
 -- Create the products table
 CREATE TABLE IF NOT EXISTS Products (

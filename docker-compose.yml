@@ -1,6 +1,5 @@
-version: "5.1.4"
-
 services:
+
   mysql-productservice:
     image: mysql:9.7.1
     container_name: mysql-productservice
@@ -15,6 +14,19 @@ services:
       - commercefabric-network
     restart: unless-stopped
 
+  rabbitmq:
+    image: rabbitmq:4.3.3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    networks:
+      - commercefabric-network
+    restart: unless-stopped
+
   productservice:
     image: danielmusselwhite/commercefabric_product_microservice:1.0.0
     container_name: productservice
@@ -23,10 +35,24 @@ services:
       dockerfile: CommerceFabric.ProductService/Dockerfile
     ports:
       - "8080:8080"
+    environment:
+      COMMERCEFABRIC_PRODUCTSERVICE_DB_HOST: mysql-productservice
+      COMMERCEFABRIC_PRODUCTSERVICE_DB_PORT: "3306"
+      COMMERCEFABRIC_PRODUCTSERVICE_DB_NAME: productDB
+      COMMERCEFABRIC_PRODUCTSERVICE_DB_USER: root
+      COMMERCEFABRIC_PRODUCTSERVICE_DB_PASSWORD: admin
+
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: "5672"
+      RABBITMQ_USER: admin
+      RABBITMQ_PASSWORD: admin
+      RABBITMQ_PRODUCTS_EXCHANGE: products.exchange
+
     networks:
       - commercefabric-network
     depends_on:
       - mysql-productservice
+      - rabbitmq
     restart: unless-stopped
 
 networks:
