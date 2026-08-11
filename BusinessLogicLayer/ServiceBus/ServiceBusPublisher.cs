@@ -19,7 +19,7 @@ namespace BusinessLogicLayer.ServiceBus
             _serviceBusClient = serviceBusClient;
             _configuration = configuration;
 
-            _serviceBusSender = _serviceBusClient.CreateSender(_configuration["ServiceBus:ProductTopic"]);
+            _serviceBusSender = _serviceBusClient.CreateSender(_configuration["ProductsServiceBus:ProductTopic"]);
         }
 
         public async Task Publish<T>(Dictionary<string, object> headers, T message)
