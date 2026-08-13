@@ -1,4 +1,5 @@
-﻿using DataAccessLayer.Entities;
+﻿using DataAccessLayer.Domain;
+using DataAccessLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -51,6 +52,13 @@ namespace DataAccessLayer.RepositoryContracts
         /// <param name="product">The product to delete from the data source.</param>
         /// <returns>A boolean indicating whether the deletion was successful.</returns>
         Task<bool> DeleteProduct(Guid productID);
+
+        /// <summary>
+        /// Asynchronously decreases the stock of a product by the specified quantity and returns a boolean indicating whether the operation was successful.
+        /// </summary>
+        /// <param name="stockReductions">A list of StockReduction objects containing the product ID and the quantity by which to decrease the stock.</param>
+        /// <returns>True if the stock was successfully decreased, otherwise false.</returns>
+        Task<bool> DecreaseProductStock(List<StockReduction> stockReductions);
 
     }
 }

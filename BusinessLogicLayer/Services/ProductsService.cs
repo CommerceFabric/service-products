@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.DTO;
 using BusinessLogicLayer.RabbitMQ;
-using BusinessLogicLayer.ServiceBus;
+using BusinessLogicLayer.ServiceBus.Publisher;
 using BusinessLogicLayer.ServiceContracts;
 using BusinessLogicLayer.Validators;
+using DataAccessLayer.Domain;
 using DataAccessLayer.Entities;
 using DataAccessLayer.RepositoryContracts;
 using FluentValidation;
@@ -170,6 +171,15 @@ namespace BusinessLogicLayer.Services
 
             var productResponse = _mapper.Map<ProductResponse>(updatedProduct);
             return productResponse;
+        }
+
+        public Task<bool> DecreaseProductStock(List<OrderItemResponse> orderItems)
+        {
+            if(orderItems == null || orderItems.Count == 0) throw new ArgumentException("Order items cannot be null or empty.");
+
+            var stockReductions = _mapper.Map<List<StockReduction>>(orderItems);
+
+            return _productsRepository.DecreaseProductStock(stockReductions);
         }
     }
 }

@@ -52,5 +52,12 @@ namespace BusinessLogicLayer.ServiceContracts
         /// <param name="productID">The unique identifier of the product to be deleted.</param>
         /// <returns>True if the product was successfully deleted, otherwise false.</returns>
         Task<bool> DeleteProduct(Guid productID);
+
+        /// <summary>
+        /// Decreases the stock of products based on the provided order items.
+        /// </summary>
+        /// <param name="orderItems">A list of order items containing product IDs and quantities to decrease.</param>
+        /// <returns>True if the stock was successfully decreased for all products, otherwise false.</returns>
+        Task<bool> DecreaseProductStock(List<OrderItemResponse> orderItems);
     }
 }

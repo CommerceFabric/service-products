@@ -1,7 +1,8 @@
 ﻿using Azure.Messaging.ServiceBus;
 using BusinessLogicLayer.Mappers;
 using BusinessLogicLayer.RabbitMQ;
-using BusinessLogicLayer.ServiceBus;
+using BusinessLogicLayer.ServiceBus.OrderCreatedConsumption;
+using BusinessLogicLayer.ServiceBus.Publisher;
 using BusinessLogicLayer.ServiceContracts;
 using BusinessLogicLayer.Services;
 using FluentValidation;
@@ -16,7 +17,8 @@ namespace BusinessLogicLayer
         {
             services.AddAutoMapper(
                 cfg => { },
-                typeof(ProductMappingProfile)
+                typeof(ProductMappingProfile),
+                typeof(StockReductionMappingProfile)
             );
 
             // Add Fluentvalidations to use as contract validators for the DTOs
@@ -38,6 +40,9 @@ namespace BusinessLogicLayer
             });
 
             services.AddSingleton<IServiceBusPublisher, ServiceBusPublisher>();
+
+            services.AddSingleton<IServiceBusOrderCreateConsumer, ServiceBusOrderCreateConsumer>();
+            services.AddHostedService<ServiceBusOrderCreateHostedService>();
 
             return services;
         }

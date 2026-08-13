@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer.Context;
+using DataAccessLayer.Domain;
 using DataAccessLayer.Entities;
 using DataAccessLayer.RepositoryContracts;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +67,34 @@ namespace DataAccessLayer.Repositories
             await _dbContext.SaveChangesAsync();
 
             return existingProduct;
+        }
+
+        public async Task<bool> DecreaseProductStock(List<StockReduction> stockReductions)
+        {
+            // Start a transaction to ensure that all stock updates are atomic
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
+            // Check if all products have enough stock before making any changes
+            foreach (var item in stockReductions)
+            {
+                // Retrieve the product from the database and check if it has enough stock, if not, rollback the transaction and return false
+                var product = await _dbContext.Products.SingleAsync(p => p.ProductID == item.ProductID);
+
+                if (product.QuantityInStock < item.Quantity)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                // Decrease the stock for the product
+                product.QuantityInStock -= item.Quantity;
+            }
+
+            // If we reach this point, it means all products have enough stock, so we can save the changes and commit the transaction
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return true;
         }
     }
 }
