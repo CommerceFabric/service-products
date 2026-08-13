@@ -12,18 +12,18 @@ namespace BusinessLogicLayer.ServiceBus
         private readonly ServiceBusClient _serviceBusClient;
         private readonly IConfiguration _configuration;
 
-        private readonly ServiceBusSender _serviceBusSender;
+        private ServiceBusSender _serviceBusSender;
 
         public ServiceBusPublisher(ServiceBusClient serviceBusClient, IConfiguration configuration)
         {
             _serviceBusClient = serviceBusClient;
             _configuration = configuration;
-
-            _serviceBusSender = _serviceBusClient.CreateSender(_configuration["ProductsServiceBus:ProductTopic"]);
         }
 
-        public async Task Publish<T>(Dictionary<string, object> headers, T message)
+        public async Task Publish<T>(string topicName, Dictionary<string, object> headers, T message)
         {
+            _serviceBusSender = _serviceBusClient.CreateSender(topicName);
+
             // create serialized service bus message 
             var messageJson = JsonSerializer.Serialize(message);
             var serviceBusMessage = new ServiceBusMessage(messageJson);

@@ -9,6 +9,7 @@ using DataAccessLayer.RepositoryContracts;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Azure.Amqp.Framing;
+using Microsoft.Extensions.Configuration;
 using System.Linq.Expressions;
 
 namespace BusinessLogicLayer.Services
@@ -22,6 +23,7 @@ namespace BusinessLogicLayer.Services
         private readonly ProductUpdateRequestValidator _productUpdateRequestValidator;
         private readonly IRabbitMQPublisher _rabbitMQPublisher;
         private readonly IServiceBusPublisher _serviceBusPublisher;
+        private readonly IConfiguration _configuration;
 
         /// <summary>
         /// The constructor for the ProductsService class, which initializes the dependencies for the service.
@@ -32,7 +34,8 @@ namespace BusinessLogicLayer.Services
         /// <param name="productUpdateRequestValidator">Dependency Injected ProductUpdateRequestValidator instance - as we use Minimal API, not Controller based API, so we need to manually validate requests</param>
         /// <param name="rabbitMQPublisher">Dependency Injected IRabbitMQPublisher instance</param>
         /// <param name="serviceBusPublisher">Dependency Injected IServiceBusPublisher instance</param>
-        public ProductsService(IMapper mapper, IProductsRepository productsRepository, ProductAddRequestValidator productAddRequestValidator, ProductUpdateRequestValidator productUpdateRequestValidator, IRabbitMQPublisher rabbitMQPublisher, IServiceBusPublisher serviceBusPublisher)
+        /// <param name="configuration">Dependency Injected IConfiguration instance</param>
+        public ProductsService(IMapper mapper, IProductsRepository productsRepository, ProductAddRequestValidator productAddRequestValidator, ProductUpdateRequestValidator productUpdateRequestValidator, IRabbitMQPublisher rabbitMQPublisher, IServiceBusPublisher serviceBusPublisher, IConfiguration configuration)
         {
             _mapper = mapper;
             _productsRepository = productsRepository;
@@ -40,6 +43,7 @@ namespace BusinessLogicLayer.Services
             _productUpdateRequestValidator = productUpdateRequestValidator;
             _rabbitMQPublisher = rabbitMQPublisher;
             _serviceBusPublisher = serviceBusPublisher;
+            _configuration = configuration;
         }
 
         public async Task<ProductResponse?> AddProduct(ProductAddRequest productAddRequest)
@@ -90,6 +94,7 @@ namespace BusinessLogicLayer.Services
                     ProductID = productID
                 };
                 await _rabbitMQPublisher.Publish(headers, message);
+                await _serviceBusPublisher.Publish(_configuration["ProductsServiceBus:ProductDeleteTopic"]!, headers, message);
             }
             
             return productDeleted;
@@ -161,7 +166,7 @@ namespace BusinessLogicLayer.Services
             };
             
             await _rabbitMQPublisher.Publish(headers, product);
-            await _serviceBusPublisher.Publish(headers, product);
+            await _serviceBusPublisher.Publish(_configuration["ProductsServiceBus:ProductUpdateTopic"]!, headers, product);
 
             var productResponse = _mapper.Map<ProductResponse>(updatedProduct);
             return productResponse;
