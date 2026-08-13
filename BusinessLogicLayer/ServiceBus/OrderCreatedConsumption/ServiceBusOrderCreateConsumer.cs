@@ -53,12 +53,21 @@ namespace BusinessLogicLayer.ServiceBus.OrderCreatedConsumption
 
                 var success = await HandleOrderCreation(orderResponse, productsService);
 
-                if(!success)
+                // todo - in future should publish a message to notify orders service of success vs failure, so that it can update the order status accordingly
+                if (!success)
                 {
                     _logger.LogError($"Failed to handle order creation for OrderID: {orderResponse.OrderID}");
-                    // TODO - Abandon for now, soon we will implement a dead letter queue for failed messages
-                    await arg.AbandonMessageAsync(arg.Message);
-                    return;
+                    
+                    // Throw to fail this message and trigger the retry mechanism of Service Bus.
+                    //throw new Exception("Failed to handle order creation. This will cause the message to be retried or dead-lettered based on the Service Bus retry policy."); 
+                    
+                    // Force the message to be dead-lettered if the order creation handling fails, so that it can be retried or investigated later
+                    await arg.DeadLetterMessageAsync(
+                        arg.Message,
+                        deadLetterReason: "InvalidOrder",
+                        deadLetterErrorDescription:
+                            $"Failed to handle order creation for OrderID: {orderResponse.OrderID}");
+
                 }
             }
 
